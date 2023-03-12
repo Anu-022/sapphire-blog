@@ -4,8 +4,8 @@
  import BlogContext from "../context/BlogContext";
 //import useFetch from "./useFetch";
  const Home = () => {
-    const {data:blogs, isLoading, error} = useContext(BlogContext)
-   //const {data: blogs, isLoading, error} = useFetch('http://localhost:8000/blogs');
+    const {data:blogs, isLoading, error,  filteredPost} = useContext(BlogContext)
+   
     return (
     
     <div className="home">
@@ -14,7 +14,11 @@
            <SearchBlog  blogs= {blogs}/>
         { error && <p className="notification">{error}</p>}
         {isLoading && <p className="notification">Loading....</p>}
-        {blogs && <BLogList blogs={blogs}  />} 
+        {filteredPost.length ? 
+          filteredPost && <BLogList blogs={filteredPost}  /> :   
+          blogs && <BLogList blogs={blogs}  />     
+        }
+ 
     
     </div>
     

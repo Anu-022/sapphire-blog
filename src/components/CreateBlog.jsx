@@ -1,9 +1,11 @@
-import {useState, useContext} from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Timestamp } from "firebase/firestore";
+import {useState, useContext} from "react"; 
+import {useNavigate} from 'react-router-dom'
 import BlogContext from "../context/BlogContext";
  const CreateBlog = () => {
     
     const {addBlog} = useContext(BlogContext)   
+    const navigate = useNavigate();
     
 
     const [titleError, setTitleError] = useState("");
@@ -45,11 +47,18 @@ import BlogContext from "../context/BlogContext";
             body: input.body,
             author: input.author,
             likes: 0,
+            date: Timestamp.now()
         } 
-        console.log(newBlog)
         addBlog(newBlog)
+        setInput({
+        title: "",
+        author: "",
+        body: "",
+        })
+        setIsDisabled(!isDisabled)
+        navigate('/');
      }
-     Navigate('/')
+     
 
     
     }

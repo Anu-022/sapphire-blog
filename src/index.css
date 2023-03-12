@@ -119,15 +119,14 @@ align-items: center;
 .submit-blog {
   display: block;
   padding: 10px 20px;
-  margin-left: 290px;
-  margin-top: 10px;
+  margin: 10px auto;
   border-radius: 5px;
   background: cornflowerblue;
   color:#fff;
   border: none;
 }
 .read-more {
-  margin-top: 10px;
+  margin-top: 15px;
 }
 .error-msg {
   color: red;
@@ -158,4 +157,14 @@ font-weight:600;
   text-align: center;
   font-size: 20px;
   margin-top: 60px;
+}
+.readMore-link {
+  text-decoration: none;
+}
+.blog-body {
+  text-align: justify;
+}
+.date-format {
+ color: #787878;
+ padding-top: 10px;
 }

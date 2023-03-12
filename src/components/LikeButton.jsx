@@ -1,17 +1,22 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import BlogContext from "../context/BlogContext";
 
 const LikeButton = ({children,blog}) => {
     const {handleLikes} = useContext(BlogContext)
 
   const likeId = blog.id;
-  let [getLikes, setLikes]= useState(blog.likes);  
+  let [getLikes, setGetLikes]= useState(blog.likes);  
 
   function incrementLikes() {
-    setLikes((prevState)=> prevState + 1)
+    setGetLikes((prevState)=> prevState + 1)
+    //setGetLikes(getLikes + 1)
     
-    handleLikes(likeId, getLikes)
+    //handleLikes(likeId, getLikes)
   }
+
+  useEffect( ()=> {
+    handleLikes(likeId, getLikes)
+  }, [getLikes])
 
     return (
         <>

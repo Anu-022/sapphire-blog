@@ -8,9 +8,12 @@ const Readmore = ({children, blog}) => {
    return (
        <>
            <div className="read-more">
+            <p className="blog-body">
             {text.length > 500 ? text.slice(0, 500): text }
+            </p>
+            
             <p>
-              <Link state={blog} to= '/readBlog'> Read More...</Link>
+              <Link className="readMore-link" state={blog} to= '/readBlog'> Read More...</Link>
             </p> 
             
             

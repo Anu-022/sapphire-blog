@@ -1,74 +1,77 @@
 import { useState, createContext, useEffect } from "react";
-
+import { collection, query, orderBy, addDoc, getDocs, doc, updateDoc} from "firebase/firestore";
+import {db} from '../firebase'
 const BlogContext = createContext()
 
 export const BlogProvider = ({children}) => {
     const [data, setData] = useState([]);
     const[isLoading, setIsLoading] =useState(true);  
-    const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] =useState('');
+    const [filteredPost, setFilteredPost] = useState([]);
 
-
+    
+// Fetch Blogs from  Firebase
     useEffect(()=> {
-        setTimeout(() =>{
-            fetch('http://localhost:8000/blogs?_sort=id&_order=desc')
-        .then(res => {
-            //console.log(res);
-            if(!res.ok) {
-                throw Error('Could not connect to resource');
-            }
-           return res.json();
-        })
-        .then(data => {
-            console.log(data);
-            setData(data);
-            setIsLoading(false);
-            setError(null);
-        })
-        .catch((err)=>{
-            setError(err.message);
-            setIsLoading(false);
-        })
+        setTimeout(() => {
+        getBlogs();
         }, 1000);
     
-    },[]);
+    }, []);
 
-    function handleSearch(event) {
-        const filtered =  data.filter((blog) => {
-          return blog.title.toLowerCase().includes(event.target.value.toLowerCase());
-        })
-        setData(filtered);
-        if (event.target.value.length < 1) { 
-            setData(data);
-        }
-    }
-    const addBlog =async (newBlog) => {
-        const res = await fetch('http://localhost:8000/blogs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body:JSON.stringify(newBlog)
-        })
-            const data = await res.json()
-            setData([data, newBlog])
-    }
-    const  handleLikes =async (likeId, getLikes) => {
-        const res = await fetch(`http://localhost:8000/blogs/${likeId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body:JSON.stringify({
-                likes: getLikes
-            }
-                
+    const getBlogs = async () => {
+        const blogRef = query(collection(db,"blogs"), orderBy('date', 'desc'))
+        await getDocs(blogRef)
+        .then ((querySnapShot) =>{ 
+            const newData =querySnapShot.docs.map((doc)=> ({
+                ...doc.data(),id: doc.id})
             )
-        })
+            setData(newData)
+            setIsLoading(false);
+            console.log(data, newData)
+            })
+        
+    }
+    
+    // function to grab the  query entered by the user
+    function handleSearch(search) {
+        setSearchTerm(search);
+    } 
+    
 
+    // function to handle blog  search Filter
+    useEffect(()=> {
+        if (searchTerm.length) {
+            const filterPost = data.filter((blog) => {
+                return (blog.title).toLowerCase().includes(searchTerm.toLowerCase());
+            })
+            setFilteredPost(filterPost);
+        } else {
+            setFilteredPost([]);
+        }
+    }, [searchTerm, data])
+    
+
+    // function to add new blogpost
+
+    const addBlog = async (newBlog) => {
+        const blogRef = (collection(db,"blogs"))
+       await addDoc(blogRef, newBlog)
+       setData([...data, newBlog])
     }
 
 
-    return <BlogContext.Provider value ={{data, isLoading, error, handleSearch, addBlog, handleLikes}}> {children}</BlogContext.Provider>
+
+    // function to update the number of likes on blog
+
+    const  handleLikes = async (likeId, getLikes) => {
+        const blogRef = doc(db,"blogs", likeId)
+       await updateDoc(blogRef, {
+        likes: getLikes,
+       })
+    }
+
+
+    return <BlogContext.Provider value ={{data, isLoading,searchTerm,filteredPost, handleSearch, addBlog, handleLikes}}> {children}</BlogContext.Provider>
 }
 
 export default BlogContext;
